@@ -4,7 +4,7 @@
 
 require 'colorize'
 require 'English'
-require 'ptools'
+require 'filemagic'
 
 PATTERN = %r{(#|//|/\*|--)\s*(todo|fixme|note)(\(.*\))?:.*$}i.freeze
 
@@ -16,18 +16,16 @@ COLORS = {
   'note' => :cyan
 }.freeze
 
-# TODO: test todo
-# FIXME: fixme!!!
-# NOTE: hmmm
+FILE_MAGIC = FileMagic.new(FileMagic::MAGIC_MIME)
 
-# TODO: This todo spans
-# multiple lines, quite complex!!!
-
-# TODO(#123): With issue number!
+# Checks if the provided file is a binary file.
+def binary?(file)
+  FILE_MAGIC.file(file) !~ %r{^text/}
+end
 
 # Recursively finds all files in the glob pattern and runs a block on each file.
 def each_file(glob, &block)
-  Dir[glob].reject { |e| File.directory?(e) || File.binary?(e) }.each(&block)
+  Dir[glob].reject { |e| File.directory?(e) || binary?(e) }.each(&block)
 end
 
 # Check if the provided line is a TODO comment.
@@ -55,10 +53,10 @@ each_file('./**/*') do |file|
   previous_type = nil
 
   IO.foreach(file) do |line|
-    if (match = line.match(PATTERN))
+    if (type = line[PATTERN, 2])
       puts
 
-      type = match.captures[1].downcase
+      type.downcase!
 
       print_filename file, $INPUT_LINE_NUMBER
       print_comment line, type
@@ -73,3 +71,5 @@ each_file('./**/*') do |file|
 end
 
 puts
+
+FILE_MAGIC.close

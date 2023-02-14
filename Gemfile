@@ -2,6 +2,6 @@
 
 source 'https://rubygems.org'
 
-gem 'solargraph'
 gem 'colorize'
-gem 'ptools'
+gem 'ruby-filemagic' # requires libmagic to be installed
+gem 'solargraph'
