@@ -2,18 +2,31 @@
 
 # frozen_string_literal: true
 
+# TODO: This is a todo!
+
+# FIXME: This is a fixme!
+# A really long...
+# long...
+# comment
+
+# WARN: This is a warning!
+
+# TODO
+
+# TODO(#123): TODO with a ticket number attached!
+
 require 'colorize'
 require 'English'
 require 'filemagic'
 
-PATTERN = %r{(#|//|/\*|--)\s*(todo|fixme|note)(\(.*\))?:.*$}i.freeze
+PATTERN = %r{(#|//|/\*|--)\s*(todo|fixme|warn)(\(.*\))?\b.*$}i.freeze
 
 COMMENTS = ['#', '//', '/*', '--'].freeze
 
 COLORS = {
   'todo' => :blue,
   'fixme' => :red,
-  'note' => :cyan
+  'warn' => :yellow
 }.freeze
 
 FILE_MAGIC = FileMagic.new(FileMagic::MAGIC_MIME)
@@ -26,11 +39,6 @@ end
 # Recursively finds all files in the glob pattern and runs a block on each file.
 def each_file(glob, &block)
   Dir[glob].reject { |e| File.directory?(e) || binary?(e) }.each(&block)
-end
-
-# Check if the provided line is a TODO comment.
-def todo_comment?(line)
-  !line.nil? && line.match(PATTERN)
 end
 
 # Check if the provided line is a comment (of any type).
@@ -51,6 +59,7 @@ end
 each_file('./**/*') do |file|
   previous_line = nil
   previous_type = nil
+  in_todo_comment = false
 
   IO.foreach(file) do |line|
     if (type = line[PATTERN, 2])
@@ -61,9 +70,13 @@ each_file('./**/*') do |file|
       print_filename file, $INPUT_LINE_NUMBER
       print_comment line, type
 
+      in_todo_comment = true
+
       previous_type = type
-    elsif todo_comment?(previous_line) && comment?(line)
+    elsif in_todo_comment && comment?(line)
       print_comment line, previous_type
+    else
+      in_todo_comment = false
     end
 
     previous_line = line
