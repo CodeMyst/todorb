@@ -3,5 +3,6 @@
 source 'https://rubygems.org'
 
 gem 'colorize'
-gem 'ruby-filemagic' # requires libmagic to be installed
+gem 'minitest'
+gem 'ruby-filemagic' # requires the libmagic system lib to be installed
 gem 'solargraph'
