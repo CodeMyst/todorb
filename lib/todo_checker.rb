@@ -2,18 +2,18 @@
 
 require 'colorize'
 
-PATTERN = %r{(#|//|/\*|--)\s*(todo|fixme|warn)(\(.*\))?\b.*$}i.freeze
-
-COMMENTS = ['#', '//', '/*', '--'].freeze
-
-COLORS = {
-  'todo' => :blue,
-  'fixme' => :red,
-  'warn' => :yellow
-}.freeze
-
 # Runs TODO comment checking on files and lines.
 class TodoChecker
+  PATTERN = %r{(#|//|/\*|--)\s*(todo|fixme|warn)(\(.*\))?\b.*$}i.freeze
+
+  COMMENTS = ['#', '//', '/*', '--'].freeze
+
+  COLORS = {
+    'todo' => :blue,
+    'fixme' => :red,
+    'warn' => :yellow
+  }.freeze
+
   # Runs TODO comment checking on a file, reporting all found TODO comments.
   def check_file(file)
     IO.foreach(file) { |line| check_line file, line }
