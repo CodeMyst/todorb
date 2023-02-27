@@ -14,19 +14,23 @@ class TodoChecker
     'warn' => :yellow
   }.freeze
 
+  def initialize(file)
+    @file = file
+  end
+
   # Runs TODO comment checking on a file, reporting all found TODO comments.
-  def check_file(file)
-    IO.foreach(file) { |line| check_line file, line }
+  def check_file
+    IO.foreach(@file) { |line| check_line line }
   end
 
   private
 
-  def check_line(file, line)
+  def check_line(line)
     if todo_comment?(line)
       type = line[PATTERN, 2].downcase
 
       puts
-      print_filename file, $INPUT_LINE_NUMBER
+      print_filename $INPUT_LINE_NUMBER
       print_comment line, type
 
       @in_todo_comment = true
@@ -55,7 +59,7 @@ class TodoChecker
   end
 
   # Prints the file name and line number.
-  def print_filename(file, line)
-    puts "#{file[2..]}:#{line}"
+  def print_filename(line)
+    puts "#{@file[2..]}:#{line}"
   end
 end
